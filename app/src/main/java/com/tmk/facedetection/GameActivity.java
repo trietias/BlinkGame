@@ -30,6 +30,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.tmk.facedetection.service.ScreenRecorderService;
 import com.tmk.facedetection.ui.camera.CameraSourcePreview;
 import com.tmk.facedetection.ui.camera.GraphicOverlay;
+import com.tmk.facedetection.GameSurfaceView;
 
 
 import java.io.IOException;
@@ -47,6 +48,7 @@ public class GameActivity extends AppCompatActivity {
     private GraphicOverlay mGraphicOverlay;
 
     // Game variables
+    protected GameSurfaceView gameView;
     public int mBlinks = 0;
     public int mSmiles = 0;
     private final int FPS = 30;
@@ -72,7 +74,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_game);
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(screen);
 
@@ -90,10 +92,12 @@ public class GameActivity extends AppCompatActivity {
         int ra = ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
         if (rc == PackageManager.PERMISSION_GRANTED && wes == PackageManager.PERMISSION_GRANTED && ra == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
+            startRecording();
         } else {
             requestCameraPermission();
         }
 
+        gameView = (GameSurfaceView) findViewById(R.id.gameSurfaceView);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -232,6 +236,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startCameraSource();
+        gameView.resume();
     }
 
     /**
@@ -241,6 +246,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mPreview.stop();
+        gameView.pause();
     }
 
     /**
