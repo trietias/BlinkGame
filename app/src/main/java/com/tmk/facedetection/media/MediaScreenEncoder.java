@@ -43,7 +43,7 @@ import com.tmk.facedetection.glutils.Texture2dProgram;
 import com.tmk.facedetection.glutils.WindowSurface;
 
 public class MediaScreenEncoder extends MediaVideoEncoderBase {
-    private static final boolean DEBUG = false; // TODO set false on release
+    private static final boolean DEBUG = true; // TODO set false on release
     private static final String TAG = "MediaScreenEncoder";
 
     private static final String MIME_TYPE = "video/avc";

@@ -10,14 +10,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,20 +26,18 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.tmk.facedetection.service.MediaListenerService;
 import com.tmk.facedetection.service.ScreenRecorderService;
 import com.tmk.facedetection.ui.camera.CameraSourcePreview;
 import com.tmk.facedetection.ui.camera.GraphicOverlay;
-import com.tmk.facedetection.GameSurfaceView;
-
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class GameActivity extends AppCompatActivity {
     private static final String TAG = "FaceTracker";
     private static final boolean DEBUG = false;
+    Context context;
 
     // Camera variables
     private CameraSource mCameraSource = null;
@@ -49,13 +46,9 @@ public class GameActivity extends AppCompatActivity {
 
     // Game variables
     protected GameSurfaceView gameView;
-    public int mBlinks = 0;
-    public int mSmiles = 0;
-    private final int FPS = 30;
-    private int directionX = 1;
-    private int directionY = 1;
-    private int speed = 10;
     private Point screen = new Point();
+    private double smileThreshold = .6;
+    private double blinkThreshold = .5;
 
     // Screen Capture variables
     private static final int REQUEST_CODE_SCREEN_CAPTURE = 1;
@@ -74,6 +67,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+        context = this;
         setContentView(R.layout.activity_game);
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(screen);
@@ -81,9 +75,6 @@ public class GameActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
-        final ImageView image = (ImageView) findViewById(R.id.imageView);
-        final TextView mBlinkText = (TextView) findViewById(R.id.blinks);
-        final TextView mSmileText = (TextView) findViewById(R.id.smiles);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -98,29 +89,6 @@ public class GameActivity extends AppCompatActivity {
         }
 
         gameView = (GameSurfaceView) findViewById(R.id.gameSurfaceView);
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                GameActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int x = (int) image.getX();
-                        int y = (int) image.getY();
-                        int guideline = screen.x / 2;
-                        if ((x >= screen.x - image.getWidth()) || (x <= guideline)) {
-                            directionX *= -1;
-                        }
-                        image.setX(x - (speed * directionX));
-                        mBlinkText.setText(String.valueOf(mBlinks));
-                        mSmileText.setText(String.valueOf(mSmiles));
-                        //image.setY(y + (speed * directionY));
-                    }
-                });
-
-            }
-        }, 0, 1000 / FPS);
     }
 
     public void stopRecording(View view) {
@@ -128,10 +96,26 @@ public class GameActivity extends AppCompatActivity {
         final Intent intent = new Intent(GameActivity.this, ScreenRecorderService.class);
         intent.setAction(ScreenRecorderService.ACTION_STOP);
         startService(intent);
-    }
+        startService(new Intent(getBaseContext(), MediaListenerService.class));
 
-    public void startRecording(View view) {
-        startRecording();
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Light_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle("Thanks for playing!")
+                .setMessage("Please give it about 10 seconds to save the video. " +
+                        "You will be notified when the video is done saving!  Don't spoil the " +
+                        "surprise for anyone!")
+                .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
+                    }
+                })
+                .setIcon(R.drawable.family)
+                .show();
     }
 
     public void startRecording() {
@@ -380,19 +364,17 @@ public class GameActivity extends AppCompatActivity {
          */
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
-            //mOverlay.add(mFaceGraphic);
-            //mFaceGraphic.updateFace(face);
 
             float left = face.getIsLeftEyeOpenProbability();
             float right = face.getIsRightEyeOpenProbability();
             float happiness = face.getIsSmilingProbability();
 
-            if (left < .5 && right < .5) {
-                mBlinks++;
+            if (left < blinkThreshold && right < blinkThreshold) {
+                gameView.blinks++;
             }
 
-            if (happiness > .5) {
-                mSmiles++;
+            if (happiness > smileThreshold) {
+                gameView.smile++;
             }
 
 

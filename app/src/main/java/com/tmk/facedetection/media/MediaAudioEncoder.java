@@ -36,7 +36,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 public class MediaAudioEncoder extends MediaEncoder {
-    private static final boolean DEBUG = false; // TODO set false on release
+    private static final boolean DEBUG = true; // TODO set false on release
     private static final String TAG = "MediaAudioEncoder";
 
     private static final String MIME_TYPE = "audio/mp4a-latm";

@@ -41,7 +41,7 @@ public class MediaMuxerWrapper {
     private static final boolean DEBUG = true; // TODO set false on release
     private static final String TAG = "MediaMuxerWrapper";
 
-    private static final String DIR_NAME = "ScreenRecSample";
+    private static final String DIR_NAME = "tmk";
     private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 
     private String mOutputPath;
@@ -59,7 +59,7 @@ public class MediaMuxerWrapper {
     public MediaMuxerWrapper(String ext) throws IOException {
         if (TextUtils.isEmpty(ext)) ext = ".mp4";
         try {
-            mOutputPath = getCaptureFile(Environment.DIRECTORY_MOVIES, ext).toString();
+            mOutputPath = getCaptureFile(Environment.DIRECTORY_DCIM, ext).toString();
         } catch (final NullPointerException e) {
             throw new RuntimeException("This app has no permission of writing external storage");
         }
@@ -159,7 +159,7 @@ public class MediaMuxerWrapper {
      * request stop recording from encoder when encoder received EOS
      */
  /*package*/ synchronized void stop() {
-        if (DEBUG) Log.v(TAG,  "stop:mStatredCount=" + mStatredCount);
+        if (DEBUG) Log.v(TAG,  "stop:mStartedCount=" + mStatredCount);
         mStatredCount--;
         if ((mEncoderCount > 0) && (mStatredCount <= 0)) {
             mMediaMuxer.stop();

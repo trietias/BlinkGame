@@ -34,7 +34,7 @@ import android.view.Surface;
 
 
 public abstract class MediaVideoEncoderBase extends MediaEncoder {
-    private static final boolean DEBUG = false; // TODO set false on release
+    private static final boolean DEBUG = true; // TODO set false on release
     private static final String TAG = "MediaVideoEncoderBase";
 
     // parameters for recording

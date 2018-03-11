@@ -1,23 +1,17 @@
 package com.tmk.facedetection;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
-import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -43,27 +37,8 @@ import java.util.TimerTask;
  */
 public final class MainActivity extends AppCompatActivity {
     private static final String TAG = "FaceTracker";
-    private static final boolean DEBUG = false;
-
-    // Camera variables
-    private CameraSource mCameraSource = null;
-    private CameraSourcePreview mPreview;
-    private GraphicOverlay mGraphicOverlay;
-
-    // Game variables
-    public int mBlinks = 0;
-    public int mSmiles = 0;
-    private final int FPS = 30;
-    private int directionX = 1;
-    private int directionY = 1;
-    private int speed = 10;
-    private Point screen = new Point();
-
-    // Screen Capture variables
-    private static final int REQUEST_CODE_SCREEN_CAPTURE = 1;
 
     // Permission variables
-    private static final int RC_HANDLE_GMS = 9001;
     private static final int RC_HANDLE_CAMERA_PERM = 2;
 
     //==============================================================================================
@@ -82,8 +57,10 @@ public final class MainActivity extends AppCompatActivity {
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int wes = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int res = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         int ra = ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        if (rc == PackageManager.PERMISSION_GRANTED && wes == PackageManager.PERMISSION_GRANTED && ra == PackageManager.PERMISSION_GRANTED) {
+        if (rc == PackageManager.PERMISSION_GRANTED && wes == PackageManager.PERMISSION_GRANTED &&
+                res == PackageManager.PERMISSION_GRANTED && ra == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG,"Permissions Granted");
         } else {
             requestCameraPermission();
@@ -91,8 +68,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void startGame(View view) {
+        Button start = (Button) findViewById(R.id.startButton);
+        start.setText("Loading...");
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
+        finish();
     }
 
 
@@ -106,26 +86,18 @@ public final class MainActivity extends AppCompatActivity {
      */
     private void requestCameraPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "No Permissions" , Toast.LENGTH_LONG).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 0);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 0);
         }
         else
         {
             Toast.makeText(this, "Has Permissions" , Toast.LENGTH_LONG).show();
         }
     }
-
     /**
-     * Callback for the result from requesting permissions. This method
-     * is invoked for every call on {@link #requestPermissions(String[], int)}.
-     * <p>
-     * <strong>Note:</strong> It is possible that the permissions request interaction
-     * with the user is interrupted. In this case you will receive empty permissions
-     * and results arrays which should be treated as a cancellation.
-     * </p>
-     *
      * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
      * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions

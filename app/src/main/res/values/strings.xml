@@ -4,4 +4,5 @@
     <string name="request_permission_storage">This app needs camera permission.</string>
     <string name="ok">Okay!</string>
     <string name="no_camera_permission">No Permission!</string>
+    <string name="exit">Quit</string>
 </resources>
