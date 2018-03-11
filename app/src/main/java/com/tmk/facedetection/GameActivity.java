@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -49,6 +50,7 @@ public class GameActivity extends AppCompatActivity {
     private Point screen = new Point();
     private double smileThreshold = .6;
     private double blinkThreshold = .5;
+    private String mName;
 
     // Screen Capture variables
     private static final int REQUEST_CODE_SCREEN_CAPTURE = 1;
@@ -72,6 +74,13 @@ public class GameActivity extends AppCompatActivity {
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(screen);
 
+        Bundle extras = getIntent().getExtras();
+
+        mName = extras.getString("name");
+        TextView mAdventureText = (TextView) findViewById(R.id.adventure);
+        String temp = (String) mAdventureText.getText();
+        temp = temp.replace("NAME", mName);
+        mAdventureText.setText(temp);
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);

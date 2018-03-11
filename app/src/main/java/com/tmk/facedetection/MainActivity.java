@@ -12,24 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.games.Game;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
-import com.tmk.facedetection.service.ScreenRecorderService;
-import com.tmk.facedetection.ui.camera.CameraSourcePreview;
-import com.tmk.facedetection.ui.camera.GraphicOverlay;
 
-
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -37,6 +23,7 @@ import java.util.TimerTask;
  */
 public final class MainActivity extends AppCompatActivity {
     private static final String TAG = "FaceTracker";
+    private static EditText mName;
 
     // Permission variables
     private static final int RC_HANDLE_CAMERA_PERM = 2;
@@ -52,6 +39,8 @@ public final class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_main);
+
+        mName = (EditText) findViewById(R.id.editText2);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -71,6 +60,8 @@ public final class MainActivity extends AppCompatActivity {
         Button start = (Button) findViewById(R.id.startButton);
         start.setText("Loading...");
         Intent intent = new Intent(this, GameActivity.class);
+        Log.d(TAG, String.valueOf(mName.getText()));
+        intent.putExtra("name", String.valueOf(mName.getText()));
         startActivity(intent);
         finish();
     }

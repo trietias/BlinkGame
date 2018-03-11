@@ -17,6 +17,7 @@ import android.view.SurfaceView;
  */
 
 public class GameSurfaceView extends SurfaceView implements Runnable{
+    private final String TAG = "GameSurfaceView";
     private boolean isRunning = false;
     private Thread gameThread;
     private SurfaceHolder holder;
@@ -27,17 +28,20 @@ public class GameSurfaceView extends SurfaceView implements Runnable{
     private Bitmap[] charSprites;
     private int screenWidth;
     private int screenHeight;
+    private int charWidth;
+    private int charHeight;
     public int blinks;
     public int smile;
 
     // game variables
-    private int jumpSpeed = 20;
+    private int jumpSpeed = 30;
     private int fallSpeed = 15;
     private int jumpHeight = 200;
-    private int startHeight = 500;
+    private int startHeight;
     private int charState = 0; // 0 = standing, 1 = jumping, 2 = falling
     private int attackState = 0; // 0 = standing, 1 = jumping, 2 = falling
     private int breath = 100;
+    private int started = 0;
 
     // sprite variables
     private long lastFrameChangeTime = 0;
@@ -49,51 +53,19 @@ public class GameSurfaceView extends SurfaceView implements Runnable{
     public GameSurfaceView(Context context){
         super(context);
 
-        holder = getHolder();
-        holder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                screenWidth = width;
-                screenHeight = height;
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-            }
-        });
-
+        setHolder();
         setUpSprites();
+
     }
 
     public GameSurfaceView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        holder = getHolder();
-        holder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                screenWidth = width;
-                screenHeight = height;
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-            }
-        });
-
+        setHolder();
         setUpSprites();
     }
 
-    public GameSurfaceView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    private void setHolder() {
         holder = getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -104,14 +76,17 @@ public class GameSurfaceView extends SurfaceView implements Runnable{
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 screenWidth = width;
                 screenHeight = height;
+                startHeight = height - 100;
+                charHeight = height / 10;
+                charWidth = width / 20;
+                fallSpeed = height / 20;
+                jumpSpeed = height / 18;
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
             }
         });
-
-        setUpSprites();
     }
 
     private void setUpSprites() {
@@ -170,15 +145,34 @@ public class GameSurfaceView extends SurfaceView implements Runnable{
     }
 
     protected void step() {
-        checkFrame();
-        checkBlinks();
-        checkSmile();
+        if (started == 0) {
+            if (startHeight == 0) {
+                for (Sprite sprite : sprites) {
+                    sprite.image = BitmapFactory.decodeResource(getResources(), R.drawable.charjump);
+                    sprite.y += fallSpeed;
+                }
+            } else {
+                for (Sprite sprite : sprites) {
+                    sprite.image = BitmapFactory.decodeResource(getResources(), R.drawable.charjump);
+                    sprite.y += fallSpeed;
+                    if (sprite.y >= startHeight) {
+                        sprite.image = BitmapFactory.decodeResource(getResources(), R.drawable.char0);
+                        started = 1;
+                    }
+                }
+            }
+        } else {
+            checkFrame();
+            checkBlinks();
+            checkSmile();
+        }
         bgs[0].x -= 10;
         bgs[1].x = bgs[0].x + screenWidth;
         if (bgs[0].x < (0 - screenWidth)) {
             bgs[0].x = 0;
             bgs[1].x = bgs[0].x + screenWidth;
         }
+
     }
 
     protected void checkBlinks() {
@@ -254,10 +248,15 @@ public class GameSurfaceView extends SurfaceView implements Runnable{
             canvas.drawBitmap(bgs[index].image, null, new RectF(bgs[index].x,bgs[index].y, bgs[index].x + screenWidth, bgs[index].y + screenHeight),null);
         }
 
-        for (int index = 0, length = sprites.length; index < length; index++) {
-            canvas.drawBitmap(sprites[index].image, sprites[index].x, sprites[index].y, null);
+        if (started == 1) {
+            for (int index = 0, length = sprites.length; index < length; index++) {
+                canvas.drawBitmap(sprites[index].image, null, new RectF(sprites[index].x,sprites[index].y, sprites[index].x + charWidth, sprites[index].y + charHeight),null);
+            }
+        } else {
+            for (int index = 0, length = sprites.length; index < length; index++) {
+                canvas.drawBitmap(sprites[index].image, sprites[index].x, sprites[index].y, null);
+            }
         }
-
     }
 
 
