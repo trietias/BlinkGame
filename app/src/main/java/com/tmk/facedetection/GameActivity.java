@@ -129,7 +129,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void startRecording() {
         final MediaProjectionManager manager
-                = (MediaProjectionManager)getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+                = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         final Intent permissionIntent = manager.createScreenCaptureIntent();
         startActivityForResult(permissionIntent, REQUEST_CODE_SCREEN_CAPTURE);
     }
@@ -169,6 +169,7 @@ public class GameActivity extends AppCompatActivity {
     //
     //  CAMERA METHODS AND CLASSES
     //
+
     /**
      * Handles the requesting of the camera permission.  This includes
      * showing a "Snackbar" message of why the permission is needed then
@@ -178,12 +179,10 @@ public class GameActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "No Permissions" , Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No Permissions", Toast.LENGTH_LONG).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 0);
-        }
-        else
-        {
-            Toast.makeText(this, "Has Permissions" , Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Has Permissions", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -408,6 +407,4 @@ public class GameActivity extends AppCompatActivity {
             mOverlay.remove(mFaceGraphic);
         }
     }
-
-
 }
