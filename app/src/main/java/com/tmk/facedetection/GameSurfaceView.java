@@ -47,7 +47,12 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     public int blinks;
     public int smile;
     public int distance;
+    private boolean invincible;
+    private int invincibleTimer;
+    private int alpha;
+    private boolean increase;
     Paint textPaint;
+    Paint alphaPaint;
 
     // game variables
     private int jumpSpeed = 30;
@@ -93,11 +98,17 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                 startHeight = (height * 3) / 5;
                 charHeight = height / 5;
                 charWidth = width / 10;
+                invincible = false;
+                increase = false;
+                invincibleTimer = 0;
+                alpha = 255;
+                alphaPaint = new Paint();
+                alphaPaint.setAlpha(alpha);
                 fallSpeed = height / 20;
                 jumpSpeed = height / 18;
                 textPaint =  new Paint();
                 textPaint.setColor(Color.BLACK);
-                textPaint.setTextSize(42);
+                textPaint.setTextSize(screenWidth / 40);
                 textPaint.setStrokeWidth(screenWidth / 40);
                 textPaint.setTextAlign(Paint.Align.LEFT);
             }
@@ -268,58 +279,60 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     }
 
     protected void checkCollision() {
-        Rect character = new Rect(player.x, player.y, player.x + charWidth,
-                player.y + charHeight);
-        for(int i = 0; i < cannons.length; i++) {
-            if(cannons[i] != null) {
-                Rect cannonball = new Rect(cannons[i].x, cannons[i].y,
-                        cannons[i].x + cannons[i].image.getWidth(),
-                        cannons[i].y + cannons[i].image.getHeight());
-                if(Rect.intersects(character,cannonball)) {
-                    Log.d(TAG,"Player Hit!");
-                    cannons[i] = null;
-                    life--;
-                    if (life == 0) {
-                        this.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Activity game = (Activity) getContext();
-                                ImageButton dash = game.findViewById(R.id.dash);
-                                ImageButton kibbles = game.findViewById(R.id.kibbles);
-                                ImageButton boy = game.findViewById(R.id.babyboy);
-                                ImageButton girl = game.findViewById(R.id.babygirl);
-                                dash.setVisibility(VISIBLE);
-                                dash.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getContext(), "Dash is too full to move right now...", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                kibbles.setVisibility(VISIBLE);
-                                kibbles.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Toast.makeText(getContext(), "Kibbles is too timid to help you right now...", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                boy.setVisibility(VISIBLE);
-                                boy.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        life = -2;
-                                        gender = "He";
-                                    }
-                                });
-                                girl.setVisibility(VISIBLE);
-                                girl.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        life = -2;
-                                        gender = "She";
-                                    }
-                                });
-                            }
-                        });
+        if(!invincible) {
+            Rect character = new Rect(player.x, player.y, player.x + charWidth,
+                    player.y + charHeight);
+            for (int i = 0; i < cannons.length; i++) {
+                if (cannons[i] != null) {
+                    Rect cannonball = new Rect(cannons[i].x, cannons[i].y,
+                            cannons[i].x + cannons[i].image.getWidth(),
+                            cannons[i].y + cannons[i].image.getHeight());
+                    if (Rect.intersects(character, cannonball)) {
+                        invincible = true;
+                        cannons[i] = null;
+                        life--;
+                        if (life == 0) {
+                            this.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Activity game = (Activity) getContext();
+                                    ImageButton dash = game.findViewById(R.id.dash);
+                                    ImageButton kibbles = game.findViewById(R.id.kibbles);
+                                    ImageButton boy = game.findViewById(R.id.babyboy);
+                                    ImageButton girl = game.findViewById(R.id.babygirl);
+                                    dash.setVisibility(VISIBLE);
+                                    dash.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Toast.makeText(getContext(), "Dash is too full to move right now...", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    kibbles.setVisibility(VISIBLE);
+                                    kibbles.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Toast.makeText(getContext(), "Kibbles is too timid to help you right now...", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    boy.setVisibility(VISIBLE);
+                                    boy.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            life = -2;
+                                            gender = "He";
+                                        }
+                                    });
+                                    girl.setVisibility(VISIBLE);
+                                    girl.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            life = -2;
+                                            gender = "She";
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 }
             }
@@ -330,9 +343,33 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
         canvas.drawColor(Color.WHITE);
         if(life > 0) {
             if (started == 1) {
+                if (invincible) {
+                    if (increase) {
+                        alpha += 25;
+                        invincibleTimer++;
+                        if (alpha > 255) {
+                            alpha = 255;
+                            increase = false;
+                        }
+                    } else {
+                        alpha -= 25;
+                        invincibleTimer++;
+                        if(alpha < 0) {
+                            alpha = 0;
+                            increase = true;
+                        }
+                    }
+                }
+                if(invincibleTimer >= 75) {
+                    invincible = false;
+                    invincibleTimer = 0;
+                }
+
+                alphaPaint.setAlpha(alpha);
+
                 canvas.drawText("Distance: " + distance, 200, 100, textPaint);
                 canvas.drawBitmap(playerLife.image, null, new RectF(100, 200, 400, 300), null);
-                canvas.drawBitmap(player.image, null, new RectF(player.x, player.y, player.x + charWidth, player.y + charHeight), null);
+                canvas.drawBitmap(player.image, null, new RectF(player.x, player.y, player.x + charWidth, player.y + charHeight), alphaPaint);
                 for (Cannon cannon : cannons) {
                     if (cannon != null) {
                         canvas.drawBitmap(cannon.image, null, new RectF(cannon.x, cannon.y, cannon.x + charWidth, cannon.y + charWidth), null);

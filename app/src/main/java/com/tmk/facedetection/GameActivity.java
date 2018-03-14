@@ -115,7 +115,7 @@ public class GameActivity extends AppCompatActivity {
         }
         builder.setTitle("Thanks for playing!")
                 .setMessage("Please give it about 10 seconds to save the video. " +
-                        "You will be notified when the video is done saving!  Don't spoil the " +
+                        "You will be notified when the video is done saving.  Don't spoil the " +
                         "surprise for anyone!")
                 .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
