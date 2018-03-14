@@ -12,14 +12,17 @@ import android.graphics.Point;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -113,18 +116,33 @@ public class GameActivity extends AppCompatActivity {
         } else {
             builder = new AlertDialog.Builder(context);
         }
-        builder.setTitle("Thanks for playing!")
-                .setMessage("Please give it about 10 seconds to save the video. " +
-                        "You will be notified when the video is done saving.  Don't spoil the " +
-                        "surprise for anyone!")
-                .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        android.os.Process.killProcess(android.os.Process.myPid());
-                        System.exit(1);
-                    }
-                })
-                .setIcon(R.drawable.family)
-                .show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setTitle("Thanks for playing!")
+                    .setMessage(Html.fromHtml("<b>" + "PLEASE WAIT ABOUT 10 SECONDS BEFORE QUITTING. " + "</b>" +
+                            "You will be notified when the video is done saving.  Don't spoil the " +
+                            "surprise for anyone!",Html.FROM_HTML_MODE_LEGACY))
+                    .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Process.killProcess(Process.myPid());
+                            System.exit(1);
+                        }
+                    })
+                    .setIcon(R.drawable.family)
+                    .show();
+        } else {
+            builder.setTitle("Thanks for playing!")
+                    .setMessage(Html.fromHtml("<b>" + "PLEASE WAIT ABOUT 10 SECONDS BEFORE QUITTING. " + "</b>" +
+                            "You will be notified when the video is done saving.  Don't spoil the " +
+                            "surprise for anyone!"))
+                    .setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Process.killProcess(Process.myPid());
+                            System.exit(1);
+                        }
+                    })
+                    .setIcon(R.drawable.family)
+                    .show();
+        }
     }
 
     public void startRecording() {
