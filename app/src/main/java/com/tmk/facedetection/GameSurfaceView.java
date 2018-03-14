@@ -52,6 +52,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     private int alpha;
     private boolean increase;
     Paint textPaint;
+    Paint textPaint1;
     Paint alphaPaint;
 
     // game variables
@@ -111,6 +112,11 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                 textPaint.setTextSize(screenWidth / 40);
                 textPaint.setStrokeWidth(screenWidth / 40);
                 textPaint.setTextAlign(Paint.Align.LEFT);
+                textPaint1 =  new Paint();
+                textPaint1.setColor(Color.BLACK);
+                textPaint1.setTextSize(screenWidth / 20);
+                textPaint1.setStrokeWidth(screenWidth / 20);
+                textPaint1.setTextAlign(Paint.Align.LEFT);
             }
 
             @Override
@@ -378,8 +384,8 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
             }
         } else if (life == 0){
             canvas.drawColor(Color.WHITE);
-            canvas.drawText("Requesting backup! Choose someone to help you.", 100, (screenHeight / 10) * 2, textPaint);
-            canvas.drawText("Requesting backup! Choose someone to help you.", 100, (screenHeight / 10) * 7, textPaint);
+            canvas.drawText("Requesting backup!", 100, (screenHeight / 10) * 2, textPaint);
+            canvas.drawText("Choose someone to help you.", 100, (screenHeight / 10) * 7, textPaint);
         } else if (life == -2){
             canvas.drawColor(Color.WHITE);
             canvas.drawText("Help is on its way! " + gender + " will be here in approximately 7 more months!", 0, 50, textPaint);
