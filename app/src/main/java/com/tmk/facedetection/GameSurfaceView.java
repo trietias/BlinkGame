@@ -347,8 +347,8 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
         } else if (life == -2){
             canvas.drawColor(Color.WHITE);
             canvas.drawText("Help is on its way! " + gender + " will be here in approximately 7 more months!", 0, 50, textPaint);
-            canvas.drawBitmap(baby.image, null, new RectF(0,100, screenWidth - 100, screenHeight - 100), null);
-            canvas.drawText("For now, click on the stop button to your left to record the video for us to see!", 0, screenHeight - 100, textPaint);
+            canvas.drawBitmap(baby.image, null, new RectF(0,100, (screenWidth * 4) / 5, screenHeight - 100), null);
+            canvas.drawText("For now, click on the stop button to your left to record the video for us to see!", 0, screenHeight - 50, textPaint);
         }
 
     }
