@@ -279,7 +279,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                     Log.d(TAG,"Player Hit!");
                     cannons[i] = null;
                     life--;
-                    if (life == -1) {
+                    if (life == 0) {
                         this.post(new Runnable() {
                             @Override
                             public void run() {
@@ -347,8 +347,8 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
         } else if (life == -2){
             canvas.drawColor(Color.WHITE);
             canvas.drawText("Help is on its way! " + gender + " will be here in approximately 7 more months!", 0, 50, textPaint);
-            canvas.drawBitmap(baby.image, null, new RectF(0,100, (screenWidth * 4) / 5, screenHeight - 100), null);
-            canvas.drawText("For now, click on the stop button to your left to record the video for us to see!", 0, screenHeight - 50, textPaint);
+            canvas.drawBitmap(baby.image, null, new RectF(0,100, (screenWidth * 4) / 5, (screenHeight * 4) / 5), null);
+            canvas.drawText("For now, click on the stop button to your left!", 0, (screenHeight / 5) * 4, textPaint);
         }
 
     }
