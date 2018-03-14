@@ -98,7 +98,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                 textPaint =  new Paint();
                 textPaint.setColor(Color.BLACK);
                 textPaint.setTextSize(42);
-                textPaint.setStrokeWidth(30);
+                textPaint.setStrokeWidth(screenWidth / 40);
                 textPaint.setTextAlign(Paint.Align.LEFT);
             }
 
@@ -306,7 +306,6 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                                 boy.setOnClickListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), "Requesting Backup!", Toast.LENGTH_SHORT).show();
                                         life = -2;
                                         gender = "He";
                                     }
@@ -315,7 +314,6 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                                 girl.setOnClickListener(new OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), "Requesting Backup!", Toast.LENGTH_SHORT).show();
                                         life = -2;
                                         gender = "She";
                                     }
@@ -343,12 +341,12 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
             }
         } else if (life == 0){
             canvas.drawColor(Color.WHITE);
-            canvas.drawText("Choose someone to help you!", 100, screenHeight / 2, textPaint);
+            canvas.drawText("Requesting backup! Choose someone to help you.", 100, screenHeight / 2, textPaint);
         } else if (life == -2){
             canvas.drawColor(Color.WHITE);
             canvas.drawText("Help is on its way! " + gender + " will be here in approximately 7 more months!", 0, 50, textPaint);
             canvas.drawBitmap(baby.image, null, new RectF(0,100, (screenWidth * 4) / 5, (screenHeight * 4) / 5), null);
-            canvas.drawText("For now, click on the stop button to your left!", 0, (screenHeight / 5) * 4, textPaint);
+            canvas.drawText("For now, click on the stop button to your left!", 0, (screenHeight / 10) * 9, textPaint);
         }
 
     }
