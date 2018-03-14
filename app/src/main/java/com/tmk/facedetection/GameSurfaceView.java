@@ -145,7 +145,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
             long started = System.currentTimeMillis();
 
             // update
-            if(life >= 0) {
+            if(life > 0) {
                 step();
             } else {
                 reveal();
