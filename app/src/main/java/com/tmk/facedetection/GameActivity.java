@@ -49,7 +49,7 @@ public class GameActivity extends AppCompatActivity {
     protected GameSurfaceView gameView;
     private Point screen = new Point();
     private double smileThreshold = .6;
-    private double blinkThreshold = .5;
+    private double blinkThreshold = .3;
     private String mName;
 
     // Screen Capture variables
@@ -377,12 +377,12 @@ public class GameActivity extends AppCompatActivity {
             float right = face.getIsRightEyeOpenProbability();
             float happiness = face.getIsSmilingProbability();
 
-            if (left < blinkThreshold && right < blinkThreshold) {
-                gameView.blinks++;
-            }
+            //if (left < blinkThreshold && right < blinkThreshold) {
+            //    gameView.blinks++;
+            //}
 
             if (happiness > smileThreshold) {
-                gameView.smile++;
+                gameView.blinks++;
             }
 
 

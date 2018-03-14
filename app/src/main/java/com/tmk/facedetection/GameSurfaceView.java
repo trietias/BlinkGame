@@ -19,6 +19,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by trietias on 3/7/18.
@@ -31,6 +32,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     private SurfaceHolder holder;
     private final static int MAX_FPS = 30;
     private final static int FRAME_PERIOD = 1000 / MAX_FPS;
+    private Sprite baby;
     private Sprite player;
     private Sprite playerLife;
     private Bitmap[] playerLifeArray;
@@ -41,6 +43,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     private int screenHeight;
     private int charWidth;
     private int charHeight;
+    private String gender;
     public int blinks;
     public int smile;
     public int distance;
@@ -96,7 +99,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                 textPaint.setColor(Color.BLACK);
                 textPaint.setTextSize(42);
                 textPaint.setStrokeWidth(30);
-                textPaint.setTextAlign(Paint.Align.CENTER);
+                textPaint.setTextAlign(Paint.Align.LEFT);
             }
 
             @Override
@@ -108,6 +111,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     private void setUpSprites() {
 
         player = new Sprite(100, startHeight, BitmapFactory.decodeResource(this.getResources(), R.drawable.char0));
+        baby = new Sprite(0,100, BitmapFactory.decodeResource(this.getResources(), R.drawable.sonogram));
 
         charSprites = new Bitmap[] {
                 BitmapFactory.decodeResource(this.getResources(), R.drawable.char0),
@@ -144,7 +148,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
             if(life >= 0) {
                 step();
             } else {
-
+                reveal();
             }
 
 
@@ -205,12 +209,7 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     }
 
     protected void reveal() {
-        new Handler(Looper.getMainLooper()).post(new Runnable () {
-            @Override
-            public void run () {
-                holder.setFixedSize(0,0);
-            }
-        });
+        // add logic
 
     }
 
@@ -287,10 +286,40 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
                                 Activity game = (Activity) getContext();
                                 ImageButton dash = game.findViewById(R.id.dash);
                                 ImageButton kibbles = game.findViewById(R.id.kibbles);
-                                ImageButton baby = game.findViewById(R.id.baby);
+                                ImageButton boy = game.findViewById(R.id.babyboy);
+                                ImageButton girl = game.findViewById(R.id.babygirl);
                                 dash.setVisibility(VISIBLE);
+                                dash.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Dash is too full to move right now...", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 kibbles.setVisibility(VISIBLE);
-                                baby.setVisibility(VISIBLE);
+                                kibbles.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Kibbles is too timid to help you right now...", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                boy.setVisibility(VISIBLE);
+                                boy.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Requesting Backup!", Toast.LENGTH_SHORT).show();
+                                        life = -2;
+                                        gender = "He";
+                                    }
+                                });
+                                girl.setVisibility(VISIBLE);
+                                girl.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Requesting Backup!", Toast.LENGTH_SHORT).show();
+                                        life = -2;
+                                        gender = "She";
+                                    }
+                                });
                             }
                         });
                     }
@@ -301,18 +330,27 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
 
     protected void render(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
-
-        if (started == 1) {
-            canvas.drawText("Distance: " + distance,200,100,textPaint);
-            canvas.drawBitmap(playerLife.image, null, new RectF(100, 200, 400, 300),null);
-            canvas.drawBitmap(player.image, null, new RectF(player.x, player.y, player.x + charWidth, player.y + charHeight),null);
-            for(Cannon cannon : cannons) {
-                if(cannon != null) {
-                    canvas.drawBitmap(cannon.image, null, new RectF(cannon.x, cannon.y, cannon.x + charWidth, cannon.y + charWidth),null);
+        if(life > 0) {
+            if (started == 1) {
+                canvas.drawText("Distance: " + distance, 200, 100, textPaint);
+                canvas.drawBitmap(playerLife.image, null, new RectF(100, 200, 400, 300), null);
+                canvas.drawBitmap(player.image, null, new RectF(player.x, player.y, player.x + charWidth, player.y + charHeight), null);
+                for (Cannon cannon : cannons) {
+                    if (cannon != null) {
+                        canvas.drawBitmap(cannon.image, null, new RectF(cannon.x, cannon.y, cannon.x + charWidth, cannon.y + charWidth), null);
+                    }
                 }
             }
-
+        } else if (life == 0){
+            canvas.drawColor(Color.WHITE);
+            canvas.drawText("Choose someone to help you!", 100, screenHeight / 2, textPaint);
+        } else if (life == -2){
+            canvas.drawColor(Color.WHITE);
+            canvas.drawText("Help is on its way! " + gender + " will be here in approximately 7 more months!", 0, 50, textPaint);
+            canvas.drawBitmap(baby.image, null, new RectF(0,100, screenWidth - 100, screenHeight - 100), null);
+            canvas.drawText("For now, click on the stop button to your left to record the video for us to see!", 0, screenHeight - 100, textPaint);
         }
+
     }
 
 
